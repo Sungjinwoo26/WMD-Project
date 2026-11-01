@@ -7,7 +7,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'college-project-secret-key'
 
-# Simple in-memory store for the lab demonstration.
+# User store for the authentication service.
 users = {}
 
 

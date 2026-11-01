@@ -50,7 +50,7 @@ export default function App() {
   return <div className="app-container">
     <Header user={CURRENT_USER} title="Nutritional Risk Classification System" />
     <main className="dashboard-main">
-      <section className="hero-panel"><div className="hero-copy"><p className="eyebrow">SDG 3 · Good Health and Well-being</p><h2>Packaged Food Safety Review</h2><p>Classify packaged foods using simple rules for sugar, sodium, fat and artificial additives.</p></div>
+      <section className="hero-panel"><div className="hero-copy"><p className="eyebrow">SDG 3 - Good Health and Well-being</p><h2>Packaged Food Safety Review</h2><p>Classify packaged foods using simple rules for sugar, sodium, fat and artificial additives.</p></div>
         <div className="stats-grid"><div className="stat-card highlight"><span className="stat-number">{riskCounts['High Risk']}</span><span className="stat-label">High Risk</span></div><div className="stat-card"><span className="stat-number">{riskCounts['Moderate Risk']}</span><span className="stat-label">Moderate</span></div><div className="stat-card"><span className="stat-number">{riskCounts['Low Risk']}</span><span className="stat-label">Low Risk</span></div></div>
       </section>
       <div className="content-grid"><div className="left-column">

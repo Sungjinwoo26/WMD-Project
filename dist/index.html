@@ -40,7 +40,7 @@
       <div class="examples">Try: <button class="chip" data-name="Cream Biscuits">Cream Biscuits</button><button class="chip" data-name="Fruit Drink">Fruit Drink</button><button class="chip" data-name="Instant Noodles">Instant Noodles</button><button class="chip" data-name="Oat Snack">Oat Snack</button></div>
     </section>
     <p id="status" class="status">Search for a product to view its nutrition profile.</p>
-    <section id="result" class="empty">Search for a sample product to see its health score.</section>
+    <section id="result" class="empty">Search for a product to see its health score.</section>
     <section class="how"><div><b>1. Search</b><span>Enter a packaged food name.</span></div><div><b>2. Product lookup</b><span>Nutrition information is retrieved for the selected product.</span></div><div><b>3. Health score</b><span>A simple rule calculates a score and risk label.</span></div></section>
   </div>
   <script>
@@ -79,7 +79,7 @@
       const e=evaluate(p), tone=e.score>=75?'good':e.score>=45?'okay':'bad', bg=e.score>=75?'goodbg':e.score>=45?'okaybg':'badbg';
       const reason=e.risk==='Low Risk'?'This product has comparatively lower sugar, sodium, fat and additives.':e.risk==='Moderate Risk'?'This product has one or more values that should be consumed in moderation.':'This product has high sugar, sodium, fat or additives and should be consumed less often.';
       $('result').className='result';
-      $('result').innerHTML='<article class="product"><img src="'+p.image+'" alt="'+p.name+'"><div class="category">'+p.category+'</div><h2>'+p.name+'</h2><div class="subtitle">Nutrition values per serving · demo data</div></article><article class="nutrition"><div class="scorehead"><div class="score '+tone+'">'+e.score+'<small>/ 100</small></div><div><div class="subtitle">Overall health score</div><div class="risklabel '+bg+'">'+e.risk+'</div></div></div><div class="metrics"><div class="metric"><b>'+p.sugar+'g</b><span>Sugar</span></div><div class="metric"><b>'+p.sodium+'mg</b><span>Sodium</span></div><div class="metric"><b>'+p.fat+'g</b><span>Fat</span></div></div><div class="reason"><b>Why this score?</b><br>'+reason+' Additives: '+p.additives+'.</div></article>';
+      $('result').innerHTML='<article class="product"><img src="'+p.image+'" alt="'+p.name+'"><div class="category">'+p.category+'</div><h2>'+p.name+'</h2><div class="subtitle">Nutrition values per serving</div></article><article class="nutrition"><div class="scorehead"><div class="score '+tone+'">'+e.score+'<small>/ 100</small></div><div><div class="subtitle">Overall health score</div><div class="risklabel '+bg+'">'+e.risk+'</div></div></div><div class="metrics"><div class="metric"><b>'+p.sugar+'g</b><span>Sugar</span></div><div class="metric"><b>'+p.sodium+'mg</b><span>Sodium</span></div><div class="metric"><b>'+p.fat+'g</b><span>Fat</span></div></div><div class="reason"><b>Why this score?</b><br>'+reason+' Additives: '+p.additives+'.</div></article>';
     }
     function search(){
       const q=$('query').value.trim().toLowerCase();
