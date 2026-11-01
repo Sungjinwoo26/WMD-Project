@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NutriGuard | Product Health Score</title>
+  <style>
+    :root { --blue:#2563eb; --dark:#10213d; --muted:#64748b; --line:#dbe5f1; --green:#16a34a; --amber:#d97706; --red:#dc2626; }
+    * { box-sizing:border-box; font-family:Segoe UI,Arial,sans-serif; } body { margin:0; background:#f5f8fc; color:#172033; }
+    .wrap { max-width:1100px; margin:auto; padding:24px; } header { display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; }
+    .brand { font-weight:800; color:var(--blue); font-size:1.35rem; } .lab { color:var(--muted); font-size:.85rem; }
+    .hero { background:linear-gradient(120deg,#153a78,#2563eb); color:#fff; padding:38px; border-radius:20px; box-shadow:0 18px 35px #1e40af30; }
+    .hero h1 { margin:0 0 9px; font-size:clamp(1.8rem,4vw,2.7rem); } .hero p { margin:0; max-width:650px; line-height:1.6; color:#dbeafe; }
+    .searchbox { display:flex; gap:10px; margin-top:24px; background:white; padding:8px; border-radius:13px; max-width:700px; }
+    .searchbox input { border:0; outline:0; flex:1; padding:11px; font-size:1rem; min-width:0; } button { border:0; cursor:pointer; font-weight:700; border-radius:9px; }
+    .searchbox button { background:var(--blue); color:#fff; padding:11px 19px; } .examples { margin-top:16px; color:#dbeafe; font-size:.82rem; }
+    .chip { background:#ffffff22; color:#fff; border:1px solid #ffffff50; padding:5px 9px; border-radius:20px; margin:5px 4px 0 0; font-size:.78rem; }
+    .status { margin:20px 0 0; color:var(--muted); font-size:.88rem; min-height:22px; }
+    #result { margin-top:22px; } .result { display:grid; grid-template-columns:1.05fr 1fr; background:#fff; border:1px solid var(--line); border-radius:18px; overflow:hidden; box-shadow:0 12px 26px #15233a10; }
+    .product { padding:24px; border-right:1px solid var(--line); } .product img { width:100%; height:210px; object-fit:cover; border-radius:12px; margin-bottom:17px; }
+    .category { color:var(--blue); font-weight:700; text-transform:uppercase; letter-spacing:.08em; font-size:.72rem; } h2 { margin:6px 0; font-size:1.65rem; } .subtitle { color:var(--muted); font-size:.9rem; }
+    .nutrition { padding:24px; } .scorehead { display:flex; align-items:center; gap:18px; margin-bottom:20px; }
+    .score { width:105px; height:105px; border-radius:50%; display:grid; place-items:center; font-size:1.8rem; font-weight:800; border:9px solid currentColor; } .score small { display:block; font-size:.7rem; font-weight:600; }
+    .good { color:var(--green); } .okay { color:var(--amber); } .bad { color:var(--red); }
+    .risklabel { padding:6px 10px; border-radius:20px; font-size:.8rem; font-weight:800; display:inline-block; } .goodbg { background:#dcfce7; color:#15803d; } .okaybg { background:#fef3c7; color:#b45309; } .badbg { background:#fee2e2; color:#b91c1c; }
+    .metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; } .metric { padding:12px 9px; background:#f8fafc; border:1px solid var(--line); border-radius:10px; text-align:center; } .metric b { display:block; font-size:1.1rem; } .metric span { color:var(--muted); font-size:.72rem; }
+    .reason { margin-top:17px; padding:12px; background:#eff6ff; color:#23467e; border-radius:10px; font-size:.88rem; line-height:1.45; }
+    .empty { text-align:center; padding:40px 20px; color:var(--muted); background:#fff; border:1px dashed var(--line); border-radius:16px; }
+    .how { display:grid; grid-template-columns:repeat(3,1fr); gap:13px; margin-top:24px; } .how div { background:#fff; padding:16px; border:1px solid var(--line); border-radius:13px; } .how b { color:var(--blue); display:block; margin-bottom:6px; } .how span { color:var(--muted); font-size:.85rem; line-height:1.4; }
+    @media(max-width:720px){ .wrap{padding:16px}.hero{padding:25px}.result{grid-template-columns:1fr}.product{border-right:0;border-bottom:1px solid var(--line)}.how{grid-template-columns:1fr}.searchbox{flex-direction:column}.searchbox button{width:100%} header{display:block}.lab{margin-top:5px} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header><div class="brand">NutriGuard</div><div class="lab">Product Health Score</div></header>
+    <section class="hero">
+      <h1>Know what is inside your packaged food.</h1>
+      <p>Search a product to fetch its nutrition data and receive a simple health score based on sugar, sodium, fat and additives.</p>
+      <div class="searchbox"><input id="query" placeholder="Search a product, e.g. Fruit Drink" autofocus><button id="searchBtn">Check Health Score</button></div>
+      <div class="examples">Try: <button class="chip" data-name="Cream Biscuits">Cream Biscuits</button><button class="chip" data-name="Fruit Drink">Fruit Drink</button><button class="chip" data-name="Instant Noodles">Instant Noodles</button><button class="chip" data-name="Oat Snack">Oat Snack</button></div>
+    </section>
+    <p id="status" class="status">Search for a product to view its nutrition profile.</p>
+    <section id="result" class="empty">Search for a sample product to see its health score.</section>
+    <section class="how"><div><b>1. Search</b><span>Enter a packaged food name.</span></div><div><b>2. Product lookup</b><span>Nutrition information is retrieved for the selected product.</span></div><div><b>3. Health score</b><span>A simple rule calculates a score and risk label.</span></div></section>
+  </div>
+  <script>
+    const products=[
+      {name:'Cream Biscuits',category:'Bakery',sugar:14,sodium:380,fat:18,additives:'Medium',image:'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=900&q=80'},
+      {name:'Fruit Drink',category:'Beverage',sugar:10,sodium:120,fat:0,additives:'Medium',image:'https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80'},
+      {name:'Instant Noodles',category:'Snack',sugar:2,sodium:920,fat:12,additives:'Medium',image:'https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=900&q=80'},
+      {name:'Oat Snack',category:'Snack',sugar:5,sodium:240,fat:8,additives:'Low',image:'https://images.unsplash.com/photo-1514996937319-344454492b37?auto=format&fit=crop&w=900&q=80'},
+      {name:'Greek Yogurt',category:'Dairy',sugar:4,sodium:80,fat:3,additives:'Low',image:'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=900&q=80'},
+      {name:'Potato Chips',category:'Snack',sugar:1,sodium:610,fat:16,additives:'High',image:'https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=900&q=80'}
+    ];
+    const productCatalog=[
+      ['Amul','Butter','Dairy'],['Amul','Cheese Slices','Dairy'],['Amul','Taaza Milk','Dairy'],['Mother Dairy','Classic Curd','Dairy'],['Britannia','Milk Bikis','Bakery'],['Britannia','Good Day Cookies','Bakery'],['Britannia','Marie Gold','Bakery'],['Parle','G Biscuits','Bakery'],['Parle','Hide & Seek','Bakery'],['Sunfeast','Dark Fantasy','Bakery'],
+      ['Kellogg\'s','Corn Flakes','Breakfast'],['Kellogg\'s','Choco Fills','Breakfast'],['Bagrry\'s','Muesli','Breakfast'],['Yoga Bar','Protein Bar','Snack'],['Yoga Bar','Oats Bar','Snack'],['Quaker','Oats','Breakfast'],['Saffola','Masala Oats','Breakfast'],['Haldiram\'s','Aloo Bhujia','Snack'],['Haldiram\'s','Moong Dal','Snack'],['Bikaji','Bikaneri Bhujia','Snack'],
+      ['Lay\'s','Classic Salted Chips','Snack'],['Lay\'s','Magic Masala Chips','Snack'],['Kurkure','Masala Munch','Snack'],['Too Yumm!','Multigrain Chips','Snack'],['Balaji','Wafers','Snack'],['Bingo!','Mad Angles','Snack'],['Uncle Chipps','Spicy Treat','Snack'],['McCain','French Fries','Ready-to-Eat'],['ITC','Aashirvaad Instant Noodles','Ready-to-Eat'],['Maggi','2-Minute Noodles','Ready-to-Eat'],
+      ['Nescafé','Classic Coffee','Beverage'],['Bru','Instant Coffee','Beverage'],['Tata Tea','Gold','Beverage'],['Red Label','Natural Care Tea','Beverage'],['Coca-Cola','Original Taste','Beverage'],['Pepsi','Cola','Beverage'],['Sprite','Lemon Drink','Beverage'],['Fanta','Orange Drink','Beverage'],['Thums Up','Strong Cola','Beverage'],['Real','Mixed Fruit Juice','Beverage'],
+      ['Tropicana','Orange Juice','Beverage'],['Paper Boat','Aam Panna','Beverage'],['Bournvita','Health Drink','Beverage'],['Horlicks','Classic Malt','Beverage'],['Complan','Nutrition Drink','Beverage'],['Yakult','Probiotic Drink','Beverage'],['Sting','Energy Drink','Beverage'],['Red Bull','Energy Drink','Beverage'],['Bisleri','Packaged Water','Beverage'],['Kinley','Packaged Water','Beverage'],
+      ['Fortune','Sunflower Oil','Pantry'],['Saffola','Gold Oil','Pantry'],['Tata','Salt','Pantry'],['Aashirvaad','Whole Wheat Atta','Pantry'],['Pillsbury','Chakki Fresh Atta','Pantry'],['India Gate','Basmati Rice','Pantry'],['Daawat','Basmati Rice','Pantry'],['Tata Sampann','Toor Dal','Pantry'],['Fortune','Besan','Pantry'],['Kissan','Mixed Fruit Jam','Pantry'],
+      ['Kissan','Tomato Ketchup','Pantry'],['Veeba','Eggless Mayonnaise','Pantry'],['Maggi','Hot & Sweet Sauce','Pantry'],['Ching\'s','Schezwan Chutney','Pantry'],['Top Ramen','Curry Noodles','Ready-to-Eat'],['Yippee!','Magic Masala Noodles','Ready-to-Eat'],['MTR','Upma Mix','Ready-to-Eat'],['MTR','Poha Mix','Ready-to-Eat'],['Gits','Gulab Jamun Mix','Ready-to-Eat'],['Knorr','Tomato Soup','Ready-to-Eat'],
+      ['Cadbury','Dairy Milk','Confectionery'],['Cadbury','5 Star','Confectionery'],['Nestlé','KitKat','Confectionery'],['Nestlé','Munch','Confectionery'],['Mars','Snickers','Confectionery'],['Ferrero','Kinder Joy','Confectionery'],['Hershey\'s','Syrup','Confectionery'],['Chupa Chups','Lollipop','Confectionery'],['Orbit','Sugar Free Gum','Confectionery'],['Tic Tac','Mint','Confectionery'],
+      ['Amul','Dark Chocolate','Confectionery'],['Epigamia','Greek Yogurt','Dairy'],['Nestlé','A+ Yogurt','Dairy'],['Danone','Greek Yogurt','Dairy'],['Tata Soulfull','Ragi Bites','Breakfast'],['Slurrp Farm','Ragi Pancake Mix','Breakfast'],['Paper Boat','Peanut Chikki','Snack'],['RiteBite','Max Protein Bar','Snack'],['The Whole Truth','Protein Bar','Snack'],['Nourish You','Quinoa','Pantry']
+    ];
+    const categoryImages={Bakery:'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=900&q=80',Breakfast:'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&w=900&q=80',Snack:'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?auto=format&fit=crop&w=900&q=80',Beverage:'https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80',Dairy:'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=900&q=80','Ready-to-Eat':'https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=900&q=80',Pantry:'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80',Confectionery:'https://images.unsplash.com/photo-1575377427642-087cf684f29d?auto=format&fit=crop&w=900&q=80'};
+    productCatalog.forEach(([brand,item,category],index)=>{
+      const sugary=['Beverage','Confectionery','Bakery'].includes(category);
+      const salty=['Snack','Ready-to-Eat','Pantry'].includes(category);
+      products.push({name:brand+' '+item,category,sugar:sugary?7+(index%12):2+(index%5),sodium:salty?250+(index%520):60+(index%160),fat:['Snack','Bakery','Confectionery'].includes(category)?6+(index%15):1+(index%5),additives:index%6===0?'High':index%3===0?'Medium':'Low',image:categoryImages[category]});
+    });
+    const $=id=>document.getElementById(id);
+    function evaluate(p){
+      let penalty=(p.sugar>12?30:p.sugar>6?15:0)+(p.sodium>450?35:p.sodium>300?18:0)+(p.fat>20?25:p.fat>12?12:0)+(p.additives==='High'?20:p.additives==='Medium'?10:0);
+      let score=Math.max(0,100-penalty), risk=score>=75?'Low Risk':score>=45?'Moderate Risk':'High Risk';
+      return {score,risk};
+    }
+    function showProduct(p){
+      const e=evaluate(p), tone=e.score>=75?'good':e.score>=45?'okay':'bad', bg=e.score>=75?'goodbg':e.score>=45?'okaybg':'badbg';
+      const reason=e.risk==='Low Risk'?'This product has comparatively lower sugar, sodium, fat and additives.':e.risk==='Moderate Risk'?'This product has one or more values that should be consumed in moderation.':'This product has high sugar, sodium, fat or additives and should be consumed less often.';
+      $('result').className='result';
+      $('result').innerHTML='<article class="product"><img src="'+p.image+'" alt="'+p.name+'"><div class="category">'+p.category+'</div><h2>'+p.name+'</h2><div class="subtitle">Nutrition values per serving · demo data</div></article><article class="nutrition"><div class="scorehead"><div class="score '+tone+'">'+e.score+'<small>/ 100</small></div><div><div class="subtitle">Overall health score</div><div class="risklabel '+bg+'">'+e.risk+'</div></div></div><div class="metrics"><div class="metric"><b>'+p.sugar+'g</b><span>Sugar</span></div><div class="metric"><b>'+p.sodium+'mg</b><span>Sodium</span></div><div class="metric"><b>'+p.fat+'g</b><span>Fat</span></div></div><div class="reason"><b>Why this score?</b><br>'+reason+' Additives: '+p.additives+'.</div></article>';
+    }
+    function search(){
+      const q=$('query').value.trim().toLowerCase();
+      const product=products.find(p=>p.name.toLowerCase().includes(q)||q.includes(p.name.toLowerCase()));
+      if(!q){$('status').textContent='Please enter a product name first.';return;}
+      $('status').textContent='Searching product catalogue…';
+      $('result').className='empty';
+      $('result').textContent='Fetching nutrition information…';
+      setTimeout(()=>{
+        if(product){$('status').textContent='Product details fetched successfully.';showProduct(product);}
+        else {$('status').textContent='No matching product found.';$('result').className='empty';$('result').textContent='No product found. Try Cream Biscuits, Fruit Drink, Instant Noodles, Oat Snack, Greek Yogurt or Potato Chips.';}
+      },750);
+    }
+    $('searchBtn').onclick=search;
+    $('query').onkeydown=e=>{if(e.key==='Enter')search()};
+    document.querySelectorAll('[data-name]').forEach(b=>b.onclick=()=>{$('query').value=b.dataset.name;search()});
+  </script>
+</body>
+</html>
